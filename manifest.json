@@ -3,12 +3,20 @@
   "name": "XHS Clipboard Upload",
   "version": "1.0",
   "description": "Use clipboard image to upload on Xiaohongshu",
-  "permissions": ["clipboardRead", "scripting"],
-  "host_permissions": ["https://www.xiaohongshu.com/*"],
+  "permissions": [
+    "clipboardRead"
+  ],
+  "host_permissions": [
+    "https://creator.xiaohongshu.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://creator.xiaohongshu.com/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://creator.xiaohongshu.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ]

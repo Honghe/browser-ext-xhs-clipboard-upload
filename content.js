@@ -12,23 +12,43 @@ function isXhsUploadInput(el) {
 function hookFileInputs() {
     // 将`.img-list`下的第一个input的hidden属性去除
     function removeInputHiddenAttribute() {
-        const imgList = document.querySelector('.img-list');
-        if (!imgList) return;
-        const input = imgList.querySelector('input[type="file"]');
-        if (input && input.hasAttribute('hidden')) input.removeAttribute('hidden');
-    }
-    // 若.img-list还没渲染出来，则监听document直到出现
-    if (document.querySelector('.img-list')) {
-        removeInputHiddenAttribute();
-    } else {
-        const waitImgList = new MutationObserver((mutations, obs) => {
-            if (document.querySelector('.img-list')) {
-                obs.disconnect();
-                removeInputHiddenAttribute();
-            }
+        const inputs = document.querySelectorAll('.drag-over input[type="file"]');
+
+        inputs.forEach((input) => {
+            input.style.opacity = '1';
+            input.style.setProperty('width', 'auto', 'important');
+            input.style.setProperty('height', 'auto', 'important');
         });
-        waitImgList.observe(document.documentElement, { childList: true, subtree: true });
+
+        if (inputs.length) {
+            console.log("已去除hidden属性", inputs);
+        }
     }
+
+    let removeInputTimer = null;
+    function scheduleRemoveInputHiddenAttribute() {
+        clearTimeout(removeInputTimer);
+        removeInputTimer = setTimeout(removeInputHiddenAttribute, 50);
+    }
+
+    const uploadInputObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (
+                    node.nodeType === Node.ELEMENT_NODE &&
+                    (
+                        node.matches?.('.drag-over, input[type="file"]') ||
+                        node.querySelector?.('.drag-over input[type="file"]')
+                    )
+                ) {
+                    scheduleRemoveInputHiddenAttribute();
+                    return;
+                }
+            }
+        }
+    });
+    removeInputHiddenAttribute();
+    uploadInputObserver.observe(document.documentElement, { childList: true, subtree: true });
 
     // 添加ctrl+click监听
     document.addEventListener("click", async (e) => {
